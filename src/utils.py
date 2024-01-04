@@ -133,3 +133,14 @@ def MAPE_(v1, v2):
         sum=sum+abs((v1[i]-v2[i])/(v1[i]))
     return (sum/n)
 
+def data_merge(datafile1,datafile2):
+
+    df1 = pd.read_csv(datafile1, header=0)
+    print("df1",df1.columns.to_numpy(), df1.shape)
+    df2 = pd.read_csv(datafile2, header=0)
+    print("df2",df2.columns.to_numpy(), df2.shape)
+
+    merged_df = pd.concat([df1, df2], axis=0, sort=False)
+    print("merged_df", merged_df.columns.to_numpy(), merged_df.shape)
+
+    return merged_df

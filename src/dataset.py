@@ -68,7 +68,6 @@ def data_loader(path,train_rate=0.8, seq_len=7):
 
     norm_data  = MinMaxScaler(ori_data)
     norm_data = norm_data[::-1]#反向读取
-    print(norm_data)
     # norm_data = reverse_data
     # Build dataset
     data_x = []
@@ -84,10 +83,7 @@ def data_loader(path,train_rate=0.8, seq_len=7):
         temp_x[-1,-1]=0
         data_x = data_x + [temp_x]
         data_y = data_y + [temp_y]
-    # print(data_x[0])
-    # print("wanc")
-    # print(data_y[0])
-    # print("wanc")
+
 
     data_x = np.asarray(data_x)
     data_y = np.asarray(data_y)
@@ -207,7 +203,7 @@ def data_loader_1(path, train_rate=0.8, seq_len=7):
 
     norm_data = MinMaxScaler(ori_data)
     norm_data = norm_data[::-1]  # 反向读取
-    print(norm_data)
+
 
     data_x = []
     data_y = []
@@ -238,10 +234,12 @@ def data_loader_1(path, train_rate=0.8, seq_len=7):
 
 class data_loader_hongwei():
     def __init__(self, pands_data, train_rate=0.8):
-        num_feature_columns = 63 + 36
         num_label_columns = 9
-        df_features = pands_data.iloc[:, :num_feature_columns]
-        df_labels = pands_data.iloc[:, num_feature_columns + 1 :num_feature_columns + num_label_columns] # "Batch名称" is not a label
+        pands_data = self.data_merge(pands_data, num_label_columns)
+        num_feature_columns = pands_data.shape[1]
+        print(num_feature_columns)
+        df_features = pands_data.iloc[:, :num_feature_columns - num_label_columns-1]
+        df_labels = pands_data.iloc[:, num_feature_columns - num_label_columns :num_feature_columns] # "Batch名称" is not a label
         
         self.max_label = df_labels.max()
         self.min_label = df_labels.min()
@@ -250,8 +248,12 @@ class data_loader_hongwei():
         data_y =df_labels.to_numpy()
         
         row_columns = pands_data.columns.to_numpy()
-        row_column_train = row_columns[:num_feature_columns]
-        row_column_label = row_columns[num_feature_columns + 1 :num_feature_columns + num_label_columns]
+        row_column_train = row_columns[:num_feature_columns - num_label_columns-1]
+        row_column_label = row_columns[num_feature_columns - num_label_columns :num_feature_columns]
+
+        print("row_column_train",row_column_train)
+        print("row_column_label",row_column_label)
+        
         self.row_column_label = row_column_label
         idx = np.random.permutation(len(pands_data))
 
@@ -277,8 +279,8 @@ class data_loader_hongwei():
         self.train_label = pd.DataFrame(train_label,columns=row_column_label)
         self.test_label = pd.DataFrame(test_label,columns=row_column_label)
 
-        print(train_data)
-        print(train_label)
+        print("train_data", train_data)
+        print("train_label", train_label)
 
     def pop_data(self):
         return self.train_data, self.test_data, self.train_label ,self.test_label
@@ -288,4 +290,29 @@ class data_loader_hongwei():
 
     def valuation(self, predicted_labels,test__labels):
         print(np.mean(np.abs(predicted_labels - test__labels), axis=0)/(self.max_label-self.min_label))
+
+
+
+    def data_merge(self, data, num_label_columns):
+        columns = [
+            'A-01', 'A-02', 'A-03', 'A-04', 'A-05', 'A-06', 'A-07', 'A-08', 'A-09', 'A-10',
+            'A-11', 'A-12', 'A-13', 'A-14', 'A-15', 'A-16', 'A-17', 'A-18', 'A-19', 'A-20',
+            'A-21', 'A-22', 'A-23', 'A-24', 'A-25', 'A-26', 'A-27', 'A-28', 'A-29', 'A-30',
+            'A-31', 'A-32', 'A-33', 'A-34', 'A-35', 'A-36', 'A-37', 'A-38', 'A-39', 'A-40',
+            'A-41', 'A-42', 'A-43', 'A-44', 'A-45', 'A-46', 'A-47', 'A-48', 'A-49', 'A-50',
+            'A-51', 'A-52', 'A-53', 'A-54', 'A-55', 'A-56', 'A-57', 'A-58', 'A-59', 'A-60',
+            'A-61', 'A-62', 'A-63', 'A-64', 'A-65', 'A-66', 'A-67', 'A-68', 'A-69', 'A-70',
+            'A-71', 'A-72', 'A-73', 'A-74', 'A-75', 'A-76', 'B-01', 'B-02', 'B-03', 'B-04',
+            'B-05', 'B-06', 'B-07', 'B-08', 'B-09', 'B-10', 'B-11', 'B-12', 'B-13', 'B-14',
+            'B-15', 'B-16', 'B-17', 'B-18', 'B-19', 'B-20', 'B-21', 'B-22', 'B-23', 'B-24',
+            'B-25', 'B-26', 'B-27', 'B-28', 'B-29', 'B-30', 'B-31', 'B-32', 'B-33', 'B-34',
+            'B-35'
+            ]
+        for column_name in columns:
+            if(column_name not in data.columns):
+                zeros_array = np.zeros(data.shape[0])
+                data.insert(loc=data.shape[1]-num_label_columns, column=column_name, value=zeros_array)
+                # data[column_name] = np.zeros(data.shape[0])
+        return data
+
 

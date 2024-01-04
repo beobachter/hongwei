@@ -6,7 +6,7 @@ import sklearn
 from model import Xgboost_lk
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
-
+from utils import data_merge
 from dataset import data_loader_hongwei
 
 
@@ -20,8 +20,8 @@ from dataset import data_loader_hongwei
 if __name__ == '__main__':
 
 
-    df = pd.read_csv('/home/user/liangk/hongwei/data.CSV', header=0)
-    
+    # df = pd.read_csv('231229.csv', header=0)
+    df = data_merge("231229_all.CSV", "data.CSV")
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
     df.fillna(0, inplace=True)
