@@ -234,11 +234,11 @@ def data_loader_1(path, train_rate=0.8, seq_len=7):
 
 class data_loader_hongwei():
     def __init__(self, pands_data, train_rate=0.8):
-        num_label_columns = 8
-        pands_data = self.data_merge(pands_data, num_label_columns)
+        num_label_columns = 9
+        # pands_data = self.data_merge(pands_data, num_label_columns)
         num_feature_columns = pands_data.shape[1]
         print(num_feature_columns)
-        df_features = pands_data.iloc[:, :num_feature_columns - num_label_columns-1]
+        df_features = pands_data.iloc[:, :num_feature_columns - num_label_columns]
         df_labels = pands_data.iloc[:, num_feature_columns - num_label_columns :num_feature_columns] # "Batch名称" is not a label
         
         self.max_label = df_labels.max()
@@ -248,7 +248,7 @@ class data_loader_hongwei():
         data_y =df_labels.to_numpy()
         
         row_columns = pands_data.columns.to_numpy()
-        row_column_train = row_columns[:num_feature_columns - num_label_columns-1]
+        row_column_train = row_columns[:num_feature_columns - num_label_columns]
         row_column_label = row_columns[num_feature_columns - num_label_columns :num_feature_columns]
 
         print("row_column_train",row_column_train)
@@ -279,14 +279,14 @@ class data_loader_hongwei():
         self.train_label = pd.DataFrame(train_label,columns=row_column_label)
         self.test_label = pd.DataFrame(test_label,columns=row_column_label)
 
-        print("train_data", train_data)
-        print("train_label", train_label)
+        # print("train_data", train_data)
+        # print("train_label", train_label)
 
     def pop_data(self):
         return self.train_data, self.test_data, self.train_label ,self.test_label
     
     def numpy_to_pandas(self, predicted, columns):
-        if isinstance(columns, (set)):
+        if isinstance(columns, (list)):
             return pd.DataFrame(predicted,columns = columns)
         else:            
             return pd.DataFrame(predicted,columns = [columns])

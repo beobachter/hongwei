@@ -18,7 +18,7 @@ from dataset import data_loader_hongwei
 # plt.show()
 
 def single_predict():
-    df = pd.read_csv('231229.csv', header=0)
+    df = pd.read_csv('231229_all.CSV', header=0)
     
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
@@ -51,7 +51,7 @@ def single_predict():
     df.to_csv('_1_predicted.csv', index=False)
 
 def mul_predict():
-    df = pd.read_csv('231229.csv', header=0)
+    df = pd.read_csv('231229_all.CSV', header=0)
     
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
@@ -74,7 +74,7 @@ def mul_predict():
     Xgboost.load_model("src/model/xgboost.model")
     predicted_labels = Xgboost.predict_xgboost(test_data)
 
-    predicted_labels = data_loader.numpy_to_pandas(predicted_labels, columns= test_label.columns)
+    predicted_labels = data_loader.numpy_to_pandas(predicted_labels, columns= test_label.columns.tolist())
     # show errors of the predicted labels in each column
     data_loader.valuation(predicted_labels, test_label)
     for i in test_label.columns:
@@ -84,5 +84,5 @@ def mul_predict():
 
 
 if __name__ == '__main__':
-    single_predict()
+    mul_predict()
 

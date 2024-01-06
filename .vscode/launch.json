@@ -14,5 +14,14 @@
             "console": "integratedTerminal",
             "justMyCode": true
         }
+
+        {
+            "name": "Python: predict",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
     ]
 }

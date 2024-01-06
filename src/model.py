@@ -10,15 +10,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import math
 import numpy as np
-
+from sklearn.model_selection import RandomizedSearchCV, train_test_split
 import operator
 from xgboost import plot_importance 
 from utils import pearson, MinMaxScaler, timestamp,evaluate_accuracy,accuracy
 from dataset import data_loader_xgb
-
+from sklearn.model_selection import KFold, cross_val_score
+import xgboost as xgb
 import matplotlib.pyplot as plt
-
-
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import make_scorer
 
 def ceate_feature_map(features):
     outfile = open('xgb.fmap', 'w')
@@ -83,34 +84,48 @@ class Xgboost_lk():
         min_child_weight=1,
         gamma=0,
         subsample=1,
-        colsample_btree=1,
+        # colsample_btree=1,
         objective='reg:squarederror',
         random_state=42
     )
 
     def train_xgboost(self,X_train, y_train):
 
-        model_final = self.model.fit(X_train, y_train)
+
+        kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+        param_space = {
+        'n_estimators': [50, 100, 200,300,400,500],
+        'max_depth': [3, 5,6, 7,10,12],
+        'learning_rate': [0.01, 0.1, 0.2,0.3,0.4,0.5]
+        }
+        mse_scorer = make_scorer(mean_squared_error, greater_is_better=False)
+        self.model = RandomizedSearchCV(estimator=self.model, param_distributions=param_space, n_iter=10, cv=5, scoring=mse_scorer, random_state=42)
+        
+        self.model.fit(X_train, y_train)
+        print("Best Parameters:", self.model.best_params_)
+        print("Best Score:", self.model.best_score_)
+        # scores = cross_val_score(self.model, X_train, y_train, cv=kfold)
+        # for fold, score in enumerate(scores, 1):
+        #     print(f'Fold {fold}: {score}')
+        # model_final = self.model.fit(X_train, y_train)
         
     # make predictions for test data
 
 
     def predict_valid_xgboost(self, X_test):
-        y_pred = self.model.predict(X_test)
+        y_pred = self.model.best_estimator_.predict(X_test)
 
         return y_pred
     
     def save_model(self, model_path):
-        self.model.save_model(model_path)
+        self.model.best_estimator_.save_model(model_path)
 
     def load_model(self, model_path):
-        booster = xgb.Booster()
-        booster.load_model(model_path)
-        self.model = booster
+        self.save_model = xgb.Booster(model_file=model_path)
 
     def predict_xgboost(self, X_test):
         X_test = xgb.DMatrix(X_test)
-        y_pred = self.model.predict(X_test)
+        y_pred = self.save_model.predict(X_test)
 
         return y_pred
 
@@ -137,8 +152,33 @@ class Xgboost_lk():
 
 
         fig,ax = plt.subplots(figsize=(15,15))
-        plot_importance(self.model,
-                    height=0.5,
-                    ax=ax,
-                    max_num_features=64)
+        try:
+            plot_importance( self.model.best_estimator_,
+                        height=0.5,
+                        ax=ax,
+                        max_num_features=64)
+        except:
+            plot_importance( self.save_model,
+                        height=0.5,
+                        ax=ax,
+                        max_num_features=64)
+        plt.show()
+
+    def plot_learning_curve(self, X_train, y_train, X_valid, y_valid):
+        # 训练和验证误差随训练样本数量的变化曲线
+        train_errors, valid_errors = [], []
+
+        for m in range(1, len(X_train) + 1):
+            self.model.fit(X_train[:m], y_train[:m])
+            y_train_pred = self.model.predict(X_train[:m])
+            y_valid_pred = self.model.predict(X_valid)
+
+            train_errors.append(mean_squared_error(y_train[:m], y_train_pred))
+            valid_errors.append(mean_squared_error(y_valid, y_valid_pred))
+
+        plt.plot(np.sqrt(train_errors), "r-+", linewidth=2, label="train")
+        plt.plot(np.sqrt(valid_errors), "b-", linewidth=3, label="valid")
+        plt.legend(loc="upper right", fontsize=14)
+        plt.xlabel("Training set size", fontsize=14)
+        plt.ylabel("RMSE", fontsize=14)
         plt.show()
