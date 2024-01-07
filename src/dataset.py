@@ -234,7 +234,7 @@ def data_loader_1(path, train_rate=0.8, seq_len=7):
 
 class data_loader_hongwei():
     def __init__(self, pands_data, train_rate=0.8):
-        num_label_columns = 9
+        num_label_columns = 8
         # pands_data = self.data_merge(pands_data, num_label_columns)
         num_feature_columns = pands_data.shape[1]
         print(num_feature_columns)
@@ -292,7 +292,7 @@ class data_loader_hongwei():
             return pd.DataFrame(predicted,columns = [columns])
 
     def valuation(self, predicted_labels,test_labels):
-        print(np.mean(np.abs(predicted_labels - test_labels), axis=0)/(self.max_label-self.min_label))
+        print(1-(np.mean(np.abs(predicted_labels - test_labels), axis=0)/(self.max_label-self.min_label)))
         # print((predicted_labels - test__labels).abs().mean(axis=0))
 
 

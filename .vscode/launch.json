@@ -5,23 +5,211 @@
     "version": "0.2.0",
     "configurations": [
 
-        
         {
-            "name": "Python: train",
+            "name": "Python: train multivariate",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/train.py",
             "console": "integratedTerminal",
-            "justMyCode": true
-        }
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--multi"
+            ]
+        },
 
         {
-            "name": "Python: predict",
+            "name": "Python: predict multivariate",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/src/predict.py",
             "console": "integratedTerminal",
-            "justMyCode": true
-        }
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--multi"
+            ]
+        },
+
+        
+        {
+            "name": "Python: train Batch CIE L",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "Batch CIE L"
+            ]
+        },
+
+        {
+            "name": "Python: predict Batch CIE L",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "Batch CIE L"
+            ]
+        },
+
+        {
+            "name": "Python: train Batch CIE a",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "Batch CIE a"
+            ]
+        },
+
+        {
+            "name": "Python: predict Batch CIE a",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "Batch CIE a"
+            ]
+        },
+
+        {
+            "name": "Python: train Batch Batch CIE b",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "Batch CIE b"
+            ]
+        },
+
+        {
+            "name": "Python: predict Batch CIE b",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "Batch CIE b"
+            ]
+        },
+        {
+            "name": "Python: train CIE DL",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE DL"
+            ]
+        },
+
+        {
+            "name": "Python: predict CIE DL",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE DL"
+            ]
+        },
+        {
+            "name": "Python: train CIE Da",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE Da"
+            ]
+        },
+
+        {
+            "name": "Python: predict CIE Da",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE Da"
+            ]
+        },
+        {
+            "name": "Python: train CIE Db",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE Db"
+            ]
+        },
+
+        {
+            "name": "Python: predict CIE Db",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE Db"
+            ]
+        },
+
+        {
+            "name": "Python: train CIE DE",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true ,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE DE"
+            ]
+        },
+
+        {
+            "name": "Python: predict CIE DE",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/predict.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args" : [
+                "--model", "xgboost",
+                "--label", "CIE DE"
+            ]
+        },
+        
     ]
 }

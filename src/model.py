@@ -20,6 +20,7 @@ import xgboost as xgb
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import make_scorer
+import joblib
 
 def ceate_feature_map(features):
     outfile = open('xgb.fmap', 'w')
@@ -46,61 +47,49 @@ def feature_importance_plot(importance_sorted, title):
 class Xgboost_lk():
     def __init__(self):
         None
-    # seed = 7
-    # test_size = 0
-    #X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=test_size, random_state=seed)
-    # test_path='data/test.csv'
-    # X_test, y_test=data_loader_xgb(test_path)
-    # seed = 7
-    # test_size = 0
-    #X_train, X_test, y_train, y_test = train_test_split(train_X, train_Y, test_size=test_size, random_state=seed)
-
-
-    # cat_sel = [n for n in dataset.columns if n.startswith('cat')]  #类别特征数值化
-    # for column in cat_sel:
-    #     dataset[column] = pd.factorize(dataset[column].values , sort=True)[0] + 1
-    #
-    # fit model no training datagoogle.csv
-
-    # model = XGBClassifier(
-    #     booster='gbtree',          # 使用的是树模型还是线性模型（gbtree，gblinear）
-    #     learning_rate=0.3,
-    #     n_estimators=100,         # 树的个数--1000棵树建立xgboost
-    #     max_depth=6,               # 树的深度
-    #     min_child_weight = 1,      # 叶子节点最小权重
-    #     gamma=0.,                  # 惩罚项中叶子结点个数前的参数
-    #     subsample=1,             # 随机选择80%样本建立决策树
-    #     colsample_btree=1,       # 随机选择80%特征建立决策树
-    #     objective='multi:softmax', # 指定损失函数
-    #     scale_pos_weight=1,        # 解决样本个数不平衡的问题
-    #     random_state=0            # 随机数
-    # )
-
-    model = XGBRegressor(
-        booster='gbtree',
-        learning_rate=0.3,
-        n_estimators=100,
-        max_depth=6,
-        min_child_weight=1,
-        gamma=0,
-        subsample=1,
-        # colsample_btree=1,
-        objective='reg:squarederror',
-        random_state=42
-    )
+        # model = XGBClassifier(
+        #     booster='gbtree',          # 使用的是树模型还是线性模型（gbtree，gblinear）
+        #     learning_rate=0.3,
+        #     n_estimators=100,         # 树的个数--1000棵树建立xgboost
+        #     max_depth=6,               # 树的深度
+        #     min_child_weight = 1,      # 叶子节点最小权重
+        #     gamma=0.,                  # 惩罚项中叶子结点个数前的参数
+        #     subsample=1,             # 随机选择80%样本建立决策树
+        #     colsample_btree=1,       # 随机选择80%特征建立决策树
+        #     objective='multi:softmax', # 指定损失函数
+        #     scale_pos_weight=1,        # 解决样本个数不平衡的问题
+        #     random_state=0            # 随机数
+        # )
+        self.model = XGBRegressor(
+            booster='gbtree',
+            learning_rate=0.3,
+            n_estimators=100,
+            max_depth=6,
+            min_child_weight=1,
+            gamma=0,
+            subsample=1,
+            # colsample_btree=1,
+            objective='reg:squarederror',
+            random_state=42
+        )
+        self.kfold = KFold(n_splits=5, shuffle=True, random_state=42)
+        self.param_space = {
+            'n_estimators': [30, 50, 100, 200, 300, 400, 500],
+            'max_depth': [3, 5, 6, 7, 10, 12],
+            'learning_rate': [0.01, 0.1, 0.2, 0.3, 0.4, 0.5]
+        }
+        self.mse_scorer = make_scorer(mean_squared_error, greater_is_better=False)
+        
 
     def train_xgboost(self,X_train, y_train):
-
-
-        kfold = KFold(n_splits=5, shuffle=True, random_state=42)
-        param_space = {
-        'n_estimators': [50, 100, 200,300,400,500],
-        'max_depth': [3, 5,6, 7,10,12],
-        'learning_rate': [0.01, 0.1, 0.2,0.3,0.4,0.5]
-        }
-        mse_scorer = make_scorer(mean_squared_error, greater_is_better=False)
-        self.model = RandomizedSearchCV(estimator=self.model, param_distributions=param_space, n_iter=10, cv=5, scoring=mse_scorer, random_state=42)
-        
+        self.model = RandomizedSearchCV(
+            estimator=self.model,
+            param_distributions=self.param_space,
+            n_iter=10,
+            cv=self.kfold,
+            scoring=self.mse_scorer,
+            random_state=42
+        )
         self.model.fit(X_train, y_train)
         print("Best Parameters:", self.model.best_params_)
         print("Best Score:", self.model.best_score_)
@@ -114,19 +103,16 @@ class Xgboost_lk():
 
     def predict_valid_xgboost(self, X_test):
         y_pred = self.model.best_estimator_.predict(X_test)
-
         return y_pred
     
     def save_model(self, model_path):
-        self.model.best_estimator_.save_model(model_path)
+        joblib.dump(self.model.best_estimator_, model_path)
 
     def load_model(self, model_path):
-        self.save_model = xgb.Booster(model_file=model_path)
+        self.model.best_estimator_ = joblib.load(model_path)
 
     def predict_xgboost(self, X_test):
-        X_test = xgb.DMatrix(X_test)
-        y_pred = self.save_model.predict(X_test)
-
+        y_pred = self.model.best_estimator_.predict(X_test)
         return y_pred
 
     def plo_show_significance(self,y_pred,y_test,label):
@@ -158,7 +144,7 @@ class Xgboost_lk():
                         ax=ax,
                         max_num_features=64)
         except:
-            plot_importance( self.save_model,
+            plot_importance( self.model.best_estimator_,
                         height=0.5,
                         ax=ax,
                         max_num_features=64)

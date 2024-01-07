@@ -1,2 +1,11 @@
 _1_predicted.csv
 src/model/xgboost.model
+src/model/xgboost.model
+src/model/xgboostBatch CIE a.model
+src/model/xgboostBatch CIE b.model
+src/model/xgboostBatch CIE L.model
+src/model/xgboostCIE Da.model
+src/model/xgboostCIE Db.model
+src/model/xgboostCIE DE.model
+src/model/xgboostCIE DL.model
+src/model/xgboost.model
