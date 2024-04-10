@@ -11,12 +11,12 @@ from dataset import data_loader_hongwei
 import argparse
 
 def single_train():
-    # df = pd.read_csv('data.CSV', header=0)
-    df = data_merge("231229_all.CSV", "data.CSV")
+    df = pd.read_csv('peise.CSV', header=0)
+    # df = data_merge("231229_all.CSV", "data.CSV")
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
     # df.fillna(0, inplace=True)
-    num_feature_columns = 63 + 36
+    num_feature_columns = 90 + 37
     num_label_columns = 8
 
 
@@ -50,9 +50,9 @@ def single_train():
     df.to_csv('_1_predicted.csv', index=False)
 
 
-def mul_train():
-    # df = pd.read_csv('data.CSV', header=0)
-    df = data_merge("231229_all.CSV", "data.CSV")
+def mul_train(input_path):
+    df = pd.read_csv(input_path, header=0)
+    # df = data_merge("231229_all.CSV", "data.CSV")
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
     # df.fillna(0, inplace=True)
@@ -91,27 +91,8 @@ def mul_train():
 
 
 
-def single_train1(label):
-    # df = pd.read_csv('data.CSV', header=0)
-    df = data_merge("231229_all.CSV", "data.CSV")
-    # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
-
-    # df.fillna(0, inplace=True)
-    num_feature_columns = 63 + 36
-    num_label_columns = 8
-
-
-    # convert 'Findings' to 'CIE DF', '不合格' to 2, '合格' to 0, '警告' to 1
-    df['Findings'] = df['Findings'].replace('unqualified', 1)
-    df['Findings'] = df['Findings'].replace('qualified', 0)
-    df['Findings'] = df['Findings'].replace('warnings', 2)
-
-    # normalize the features and labels
-    data_loader = data_loader_hongwei(df,train_rate=1)
-    train_data, _, train_label ,_ = data_loader.pop_data()
-
-
-    df = pd.read_csv('231229_all.CSV', header=0)
+def single_train1(input_path,label):
+    df = pd.read_csv(input_path, header=0)
     # df = data_merge("231229_all.CSV", "data.CSV")
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
@@ -126,8 +107,27 @@ def single_train1(label):
     df['Findings'] = df['Findings'].replace('warnings', 2)
 
     # normalize the features and labels
-    data_loader = data_loader_hongwei(df,train_rate=0)
-    _, test_data, _ ,test_label = data_loader.pop_data()
+    data_loader = data_loader_hongwei(df,train_rate=0.8)
+    train_data, test_data, train_label ,test_label = data_loader.pop_data()
+
+
+    df = pd.read_csv('peise.CSV', header=0)
+    # df = data_merge("231229_all.CSV", "data.CSV")
+    # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
+
+    # df.fillna(0, inplace=True)
+    num_feature_columns = 63 + 36
+    num_label_columns = 8
+
+
+    # convert 'Findings' to 'CIE DF', '不合格' to 2, '合格' to 0, '警告' to 1
+    df['Findings'] = df['Findings'].replace('unqualified', 1)
+    df['Findings'] = df['Findings'].replace('qualified', 0)
+    df['Findings'] = df['Findings'].replace('warnings', 2)
+
+    # normalize the features and labels
+    # data_loader = data_loader_hongwei(df,train_rate=0)
+    # _, test_data, _ ,test_label = data_loader.pop_data()
 
 
 
@@ -146,7 +146,7 @@ def single_train1(label):
     # show errors of the predicted labels in each column
     data_loader.valuation(predicted_labels, test_label)
     
-    # Xgboost.plo_show_significance(predicted_labels, test_label,"Batch CIE L")
+    Xgboost.plo_show_significance(predicted_labels, test_label,label=label)
 
     Xgboost.save_model("src/model/xgboost"+label+".model")
 
@@ -157,6 +157,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='train type and label',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--input', '-i', default=None,
+                        help="train data file path")
     parser.add_argument('--model', '-m', default='xgboost',
                         help="models: xgboost")
     parser.add_argument('--multi',  action='store_true', 
@@ -165,8 +167,8 @@ if __name__ == '__main__':
                         help='label of single variables')
     args = parser.parse_args()
     if args.multi:
-        mul_train()
+        mul_train( args.input)
     else:
-        single_train1(args.label)
+        single_train1(args.input, args.label)
 
 

@@ -248,7 +248,7 @@ class data_loader_hongwei():
         data_y =df_labels.to_numpy()
         
         row_columns = pands_data.columns.to_numpy()
-        row_column_train = row_columns[:num_feature_columns - num_label_columns]
+        row_column_train = row_columns[ : num_feature_columns - num_label_columns]
         row_column_label = row_columns[num_feature_columns - num_label_columns :num_feature_columns]
 
         print("row_column_train",row_column_train)
@@ -273,7 +273,7 @@ class data_loader_hongwei():
 
 
         print(train_data.shape,test_data.shape,train_label.shape,test_label.shape)
-        train_data, train_label = self.remove_outliers(train_data, train_label, self.row_column_label)
+
         self.train_data = pd.DataFrame(train_data,columns=row_column_train)
         self.test_data = pd.DataFrame(test_data,columns=row_column_train)
         self.train_label = pd.DataFrame(train_label,columns=row_column_label)
@@ -295,16 +295,7 @@ class data_loader_hongwei():
         print(1-(np.mean(np.abs(predicted_labels - test_labels), axis=0)/(self.max_label-self.min_label)))
         # print((predicted_labels - test__labels).abs().mean(axis=0))
 
-    def remove_outliers(self, X_original, y_original, y_names):
-        for i in range(y_original.shape[1]):
-            y_mean = np.mean(y_original[:, i])
-            y_std = np.std(y_original[:, i])
-            mask = np.abs(y_original[:, i] - y_mean) < 3 * y_std
-            X_original = X_original[mask]
-            y_original = y_original[mask]
-        return X_original, y_original
 
-    
     def data_merge(self, data, num_label_columns):
         columns = [
             'A-01', 'A-02', 'A-03', 'A-04', 'A-05', 'A-06', 'A-07', 'A-08', 'A-09', 'A-10',

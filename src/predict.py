@@ -17,9 +17,9 @@ import argparse
 
 # plt.show()
 
-def single_predict(label):
+def single_predict(input_file ,output_file, label):
 
-    df = pd.read_csv('231229_all.CSV', header=0)
+    df = pd.read_csv(input_file, header=0)
     # df = data_merge("231229_all.CSV", "data.CSV")
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
@@ -54,11 +54,11 @@ def single_predict(label):
     for i in test_label.columns:
         Xgboost.plo_show_significance(predicted_labels, test_label,i)
 
-    df.to_csv('_1_predicted.csv', index=False)
+    df.to_csv(output_file, index=False)
 
 
-def mul_predict():
-    df = pd.read_csv('231229_all.CSV', header=0)
+def mul_predict(input_file ,output_file):
+    df = pd.read_csv(input_file, header=0)
     
     # df = pd.read_excel("/home/user/liangk/hongwei/配色数据—鸿之微.xlsx")
 
@@ -88,12 +88,16 @@ def mul_predict():
     for i in test_label.columns:
         Xgboost.plo_show_significance(predicted_labels, test_label,i)
 
-    df.to_csv('_1_predicted.csv', index=False)
+    df.to_csv(output_file, index=False)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='train type and label',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--input', '-i', type=str, default=None,
+                        help="predict data file path,   _ .CSV ")
+    parser.add_argument('--output', '-o', type=str, default='predicted.csv',
+                        help="predict result file path")
     parser.add_argument('--model', '-m', default='xgboost',
                         help="models: xgboost")
     parser.add_argument('--multi',  action='store_true', 
@@ -102,7 +106,7 @@ if __name__ == '__main__':
                         help='label of single variables')
     args = parser.parse_args()
     if args.multi:
-        mul_predict()
+        mul_predict(args.input, args.output)
     else:
-        single_predict(args.label)
+        single_predict(args.input, args.output, args.label)
 

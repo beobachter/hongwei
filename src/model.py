@@ -1,6 +1,5 @@
 
 
-import xgboost
 # First XGBoost model for Pima Indians dataset
 from numpy import loadtxt
 import pandas as pd
@@ -74,7 +73,7 @@ class Xgboost_lk():
         )
         self.kfold = KFold(n_splits=5, shuffle=True, random_state=42)
         self.param_space = {
-            'n_estimators': [30, 50, 100, 200, 300, 400, 500],
+            'n_estimators': [30, 50, 100, 200],
             'max_depth': [3, 5, 6, 7, 10, 12],
             'learning_rate': [0.01, 0.1, 0.2, 0.3, 0.4, 0.5]
         }
