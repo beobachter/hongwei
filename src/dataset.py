@@ -235,6 +235,8 @@ def data_loader_1(path, train_rate=0.8, seq_len=7):
 class data_loader_hongwei():
     def __init__(self, pands_data, train_rate=0.8):
         num_label_columns = 8
+        Confidence_Check = ["CIE DL", "CIE Da", "CIE Db" ,"CIE DE"]
+        pands_data.fillna(0, inplace=True)
         # pands_data = self.data_merge(pands_data, num_label_columns)
         num_feature_columns = pands_data.shape[1]
         print(num_feature_columns)
@@ -273,7 +275,7 @@ class data_loader_hongwei():
 
 
         print(train_data.shape,test_data.shape,train_label.shape,test_label.shape)
-
+        train_data, train_label = self.remove_outliers_multiple_labels(train_data, train_label, self.row_column_label, Confidence_Check)
         self.train_data = pd.DataFrame(train_data,columns=row_column_train)
         self.test_data = pd.DataFrame(test_data,columns=row_column_train)
         self.train_label = pd.DataFrame(train_label,columns=row_column_label)
@@ -295,6 +297,31 @@ class data_loader_hongwei():
         print(1-(np.mean(np.abs(predicted_labels - test_labels), axis=0)/(self.max_label-self.min_label)))
         # print((predicted_labels - test__labels).abs().mean(axis=0))
 
+    def remove_outliers_multiple_labels(self, X_original, y_original, y_names, label_names):
+        if not isinstance(label_names, (list, tuple)):
+            print("label_names must be a list or tuple of label names.")
+            return X_original, y_original
+
+        y_names_list = list(y_names)
+
+        for label_name in label_names:
+            if label_name in y_names_list:
+                i = y_names_list.index(label_name)
+                if y_original[:, i].size > 0 and not np.isnan(y_original[:, i]).all():
+                    y_mean = np.nanmean(y_original[:, i])  
+                    y_std = np.nanstd(y_original[:, i])  
+                    mask = np.abs(y_original[:, i] - y_mean) < 3 * y_std
+                    if mask.size > 0 and mask.any():
+                        X_original, y_original = X_original[mask], y_original[mask]
+                    else:
+                        print("Skipping due to empty mask or all NaN values for label:", label_name)
+                else:
+                    print(f"Column for label '{label_name}' is empty or all NaN. Skipping...")
+            else:
+                print(f"Label name '{label_name}' not found in y_names.")
+        
+        return X_original, y_original
+    
 
     def data_merge(self, data, num_label_columns):
         columns = [
